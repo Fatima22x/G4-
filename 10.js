@@ -19,7 +19,7 @@ function _main()
     // First graph for exercise8_4_1
     var g = new Graph();
     g.label = "Exercise 8.4: 1 (Levitin, 3rd edition)";
-    g.digraph = true;
+    g.digraph = false; 
     g.readGraph(_v, _e);
     g.printGraph();
 
@@ -29,21 +29,24 @@ function _main()
     // report connectivity status if available
     document.write("<p> ", g.componentInfo(), "</p>");
 
+    g.connectedComp = g.topoSearch(g.bfs);
+    document.write("<p>bfs_order: ", g.bfs_order, "</p>");
+
     g.makeAdjMatrix();
 
     // Output DFS-based TC matrix
-    g.dfsTC();
-    document.write("<p>TC matrix by DFS:</p>");
-    for (var i = 0; i < g.DfsTC.length; i++)
-    {
-        document.write(g.DfsTC[i], "</br>");
+    // g.dfsTC();
+    // document.write("<p>TC matrix by DFS:</p>");
+    // for (var i = 0; i < g.DfsTC.length; i++)
+    // {
+    //     document.write(g.DfsTC[i], "</br>");
 
-    }
+    // }
 
     // Output Warshall matrix
     g.warshallFloyd();
-    document.write("<p>TC matrix by Warshall-Floyd:</p>");
-    if (g.adjMatrix[0][0] != undefined)
+    document.write("<p>Transitive Closure</p>");
+    if (g.adjMatrix[0][0].tc != undefined) 
     {
         for (var i = 0; i < g.adjMatrix.length; i++)
         {
@@ -56,86 +59,101 @@ function _main()
     }
     else 
     {
-        document.write("Graph is not DAG, TC does not apply.")
-    }  
-    // Report if DAG or not
-    document.write("<p>DAG: ", g.isDAG(), "</br>");
-
-
-
-    // Second graph for exercise8_4_7
-    var g2 = new Graph();
-    g2.label = "Exercise 8.4: 1 (Levitin, 3rd edition)";
-    g2.digraph = true;
-    g2.readGraph(_v2, _e2);
-
-    // Output Warshall matrix
-    g2.warshallFloyd();
-    document.write("<p>TC matrix by Warshall-Floyd Exercise 8.4: 7</p>");
-    if (g2.adjMatrix[0][0].tc != undefined)
-    {
-        for (var i = 0; i < g2.adjMatrix.length; i++)
-        {
-            for (var j = 0; j < g2.adjMatrix.length; j++)
-            {
-                document.write(g2.adjMatrix[i][j].tc, j == g2.adjMatrix.length - 1 ? " " : ",");
-            }
-            document.write("</br>");
-        }
-    } 
-    else 
-    {
-        document.write("Graph is not DAG, TC does not apply.")
-    }  
+        document.write("<p>Graph is not digraph, TC is not applicable.</p>");
+    }
 
     // Output FLoyd matrix
-    if (g2.adjMatrix[0][0].dist != undefined)
+    document.write("<p>Distance matrix</p>");
+    if (g.adjMatrix[0][0].dist != undefined) 
     {
-        document.write("<p>Distance matrix Exercise 8.4: 7</p>");
-        for (var i = 0; i < g2.adjMatrix.length; i++)
+        for (var i = 0; i < g.adjMatrix.length; i++)
         {
-            for (var j = 0; j < g2.adjMatrix.length; j++)
+            for (var j = 0; j < g.adjMatrix.length; j++)
             {
-                document.write(g2.adjMatrix[i][j].dist, j == g2.adjMatrix.length - 1 ? " " : ",");
+                document.write(g.adjMatrix[i][j].dist, j == g.adjMatrix.length - 1 ? " " : ",");
             }
             document.write("</br>");
         }
     }
     else 
     {
-        document.write("Graph is not Weighted.")
-    }  
-
-    // Report if DAG or not
-    document.write("<p>DAG Exercise 8.4: 7 </br>", g2.isDAG(), "</br>");
-
-
-
-    // Third graph for ksa12cities
-    var g3 = new Graph();
-    g3.label = "KSA 12 Cities Dataset";
-    g3.digraph = false;
-    g3.readGraph(_v3, _e3);
-
-    if (g3.weighted && !g3.digraph)
-    {
-        g3.prim();
-
-        // output the Prim matrix
-        document.write("<p>MST for " + g3.label + "</p>");
-        var path = " " + g3.Prim[0].v.label + " ";
-        var total = 0;
-        for (var i = 0; i < g3.Prim.length; i++)
-        {
-            path = path + " " + g3.Prim[i].u.label + ", ";
-            document.write("The path weight from " + g3.Prim[i].v.label + " to " + g3.Prim[i].u.label + " is: " +
-                g3.Prim[i].w, " </br>");
-            total = total + g3.Prim[i].w;
-        }
-
-        document.write("</br>Shortest path: " + path + " </br>Total weight: " + total);
-
+        document.write("<p>Graph is not weighted, distance matrix is not applicable.</p>");
     }
+
+    // Prim's algorithm
+    document.write("<p>MST by Prim2 (linear PQ)</p>");
+    g.prim();
+   
+    // Dijkstra's algorithm
+    document.write("<p>Shortest paths by Dijkstra from vertex 0</p>");
+    var s = 0;
+    g.dijkstra(0);
+
+    document.write("<p>Distance matrix from Dijkstra</p>");
+    for (var i = 0; i < this.v; i++) 
+    {
+        g.dijkstra(i);
+    }
+
+    // // Second graph for exercise8_4_7
+    // var g2 = new Graph();
+    // g2.label = "Exercise 8.4: 1 (Levitin, 3rd edition)";
+    // g2.digraph = true;
+    // g2.readGraph(_v2, _e2);
+
+    // // Output Warshall matrix
+    // g2.warshallFloyd();
+    // document.write("<p>TC matrix by Warshall-Floyd Exercise 8.4: 7</p>");
+    // for (var i = 0; i < g2.adjMatrix.length; i++)
+    // {
+    //     for (var j = 0; j < g2.adjMatrix.length; j++)
+    //     {
+    //         document.write(g2.adjMatrix[i][j].tc, j == g2.adjMatrix.length - 1 ? " " : ",");
+    //     }
+    //     document.write("</br>");
+    // }
+
+    // // Output FLoyd matrix
+    // document.write("<p>Distance matrix Exercise 8.4: 7</p>");
+    // for (var i = 0; i < g2.adjMatrix.length; i++)
+    // {
+    //     for (var j = 0; j < g2.adjMatrix.length; j++)
+    //     {
+    //         document.write(g2.adjMatrix[i][j].dist, j == g2.adjMatrix.length - 1 ? " " : ",");
+    //     }
+    //     document.write("</br>");
+    // }
+
+    // // Report if DAG or not
+    // document.write("<p>DAG Exercise 8.4: 7 </br>", g2.isDAG(), "</br>");
+
+
+
+    // // Third graph for ksa12cities
+    // var g3 = new Graph();
+    // g3.label = "KSA 12 Cities Dataset";
+    // g3.digraph = false;
+    // g3.readGraph(_v3, _e3);
+
+    // if (g3.weighted && !g3.digraph)
+    // {
+    //     g3.prim();
+
+    //     // output the Prim matrix
+    //     document.write("<p>MST for " + g3.label + "</p>");
+    //     var path = " " + g3.Prim[0].v.label + " ";
+    //     var total = 0;
+    //     for (var i = 0; i < g3.Prim.length; i++)
+    //     {
+    //         path = path + " " + g3.Prim[i].u.label + ", ";
+    //         document.write("The path weight from " + g3.Prim[i].v.label + " to " + g3.Prim[i].u.label + " is: " +
+    //             g3.Prim[i].w, " </br>");
+    //         total = total + g3.Prim[i].w;
+    //     }
+
+    //     document.write("</br>Shortest path: " + path + " </br>Total weight: " + total);
+
+    // }
 
 }
 
@@ -240,8 +258,6 @@ function Graph()
     // more student fields next
 
     this.DfsTC = [];
-    // this.Warshall = [];
-    // this.Floyd = [];
     this.Prim = [];
 
     // --------------------
@@ -263,7 +279,8 @@ function Graph()
     this.isDAG = isDAGImpl;
     this.warshallFloyd = warshallFloydImpl2;
     this.dfsTC = dfsTCImpl;
-    this.prim = primImpl;
+    this.prim = primImpl2;
+    this.dijkstra = DijkstraImpl;
 
 }
 
@@ -395,58 +412,45 @@ function warshallFloydImpl()
 function warshallFloydImpl2()
 {
     this.makeAdjMatrix();
-    var newAdjMatrix = [];
+    var newAdjMatrix = [], floyd = [], warshall = [];
 
     for (var i = 0; i < this.adjMatrix.length; i++)
     {
-        newAdjMatrix[i] = this.adjMatrix[i].slice();
+        newAdjMatrix[i] = [];
+        floyd[i] = this.adjMatrix[i].slice();
+        warshall[i] = this.adjMatrix[i].slice();
 
         // check if there is relation between vertices  
-        if (this.weighted)
+        for (var j = 0; j < this.nv; j++)
         {
-            for (var j = 0; j < this.nv; j++)
+            if (floyd[i][j] == 0 && (i != j))
             {
-                if (this.adjMatrix[i][j] == 0 && (i != j))
-                {
-                    newAdjMatrix[i][j] = {"dist": Infinity};
-                }
+                floyd[i][j] = Infinity;
             }
         }
-        
     }
 
-    for (var k = 0; k < this.adjMatrix.length; k++)
+    for (var k = 0; k < warshall.length; k++)
     {
-        for (var i = 0; i < this.adjMatrix.length; i++)
+        for (var i = 0; i < warshall.length; i++)
         {
-            for (var j = 0; j < this.adjMatrix.length; j++)
+            for (var j = 0; j < warshall.length; j++)
             {
-                this.adjMatrix[i][j] = {"tc": this.adjMatrix[i][j]};
-                this.adjMatrix[i][j].tc = (this.adjMatrix[i][j].tc ||
-                    (this.adjMatrix[i][k].tc && this.adjMatrix[k][j].tc)) ? 1 : 0;
+                warshall[i][j] = (warshall[i][j] ||
+                    (warshall[i][k] && warshall[k][j])) ? 1 : 0;
 
-                this.adjMatrix[i][j].dist =
-                    Math.min(this.adjMatrix[i][j].dist, (this.adjMatrix[i][k].dist + this.adjMatrix[k][j].dist));
-                
-                if (this.weighted) 
-                {
-                    newAdjMatrix[i][j] = {
-                            "dist": this.adjMatrix[i][j].dist
-                        }
-                }
+                floyd[i][j] = this.shortestPath(floyd, i, j, k);
 
-                if (this.isDAG())
+                newAdjMatrix[i][j] = 
                 {
-                    newAdjMatrix[i][j] = {
-                        "tc": this.adjMatrix[i][j].tc,
-                    }
+                    "tc": this.digraph ? warshall[i][j]: undefined,
+                    "dist": this.weighted ? floyd[i][j]: undefined
                 }
-                
             }
         }
 
     }
-    
+
     this.adjMatrix = newAdjMatrix.map(function(arr)
     {
         return arr.slice();
@@ -457,15 +461,17 @@ function warshallFloydImpl2()
 /**
  * @description return distance of shortest path between v_i, v_j in weighted graph 
  * @method shortestPath
- * @param {integer} v_i  Source vertex id
- * @param {integer} v_j  Target vertex id
+ * @param {array} floyd  Source vertex id
+ * @param {integer} i  i ID
+ * @param {integer} j  j ID
+ * @param {integer} k  k ID
  * @author Fatima Falath
  * @returns {edge} shortest path between two vertices
  */
 
-function shortestPathImpl(v_i, v_j)
-{   
-    return (this.adjMatrix[v_i][v_j].dist);
+function shortestPathImpl(floyd, i, j, k)
+{
+    return (Math.min(floyd[i][j], (floyd[i][k] + floyd[k][j])));
 }
 
 /**
@@ -544,6 +550,166 @@ function primImpl()
     }
 }
 
+function primImpl2()
+{
+
+
+//create a piriority queue
+var pq = new PQueue();
+
+this.VE = this.vert.slice();
+this.VT = [];
+this.ET = [];
+
+//set all vertices as unvisited
+for (var i = 0; i < this.nv; i++)
+{
+this.VE[i].visit = false;
+}
+
+
+//get the first node incidents
+var v0 = this.VE[0].incidentEdges();
+parentV = 0;
+
+//incidents of the first vertex
+for (var i = 0; i < v0.length; i++)
+{
+var u = v0[i].adjVert_i;
+var wu = v0[i].edgeWeight;
+pq.insert(u, wu);
+}
+
+//assign parent for the first vertex as null
+this.VT[this.VT.length] = {
+tree: 0,
+parent: null
+}
+this.VE[0].visit = true;
+
+
+//for (var i = 0; i < this.nv - 1; i++)
+while (!pq.isEmpty() && this.ET.length < this.nv - 1)
+{
+var u = pq.deleteMin();
+console.log("in delete min " + u);
+
+//delete for duplication
+while (this.vert[u.item].visit)
+u = pq.deleteMin();
+
+
+//find adjacency for the
+//update parent to the
+var v = this.vert[u.item].incidentEdges();
+for (var j = 0; j < v.length; j++)
+{
+if (this.VE[v[j].adjVert_i].visit)
+{
+if (v[j].edgeWeight === u.prior)
+{
+parentV = v[j].adjVert_i;
+break;
+}
+}
+}
+
+//update vt
+//insert the new node (priority one) in VT
+//mark as visited
+
+if (!this.vert[u.item].visit)
+{
+this.VT[this.VT.length] = {
+tree: u.item,
+parent: parentV
+};
+this.VE[u.item].visit = true;
+
+
+
+
+//update ET
+this.ET[this.ET.length] = new Edge(u.item, u.prior);
+
+
+//update pq
+v = this.VE[u.item].incidentEdges();
+for (var j = 0; j < v.length; j++)
+{
+if (!this.vert[v[j].adjVert_i].visit)
+{
+u = v[j].adjVert_i;
+wu = v[j].edgeWeight;
+pq.insert(u, wu);
+}
+}
+}
+
+
+
+}
+
+
+
+//print
+for (var n = 0; n < this.VT.length; n++)
+{
+document.write("(",
+(this.VT[n].parent === null) ? "-" : this.VT[n].parent, ",",
+this.VT[n].tree, ")");
+}
+
+
+}
+
+function DijkstraImpl(S) {
+
+    var s = S; //given vertex called source (start from vertex 0)
+    var d = []; //the length of the shortest path from the source (vertex 0) to any vertex
+    var pv = []; //penultimate vertices 
+    var u; //the nearest vertex with d the shortest path from s to any vertex
+    
+    //initialize priority queue
+    var PQ = new PQueue();
+    
+    
+    for (var i = 0; i < this.nv; i++) {
+    
+    d[i] = Infinity;
+    pv[i] = "-"; //null
+    PQ.insert(i, d[i]); //initialize vertex priority in the priority queue
+    }
+    
+    d[s] = 0; PQ.decrease(s, d[s]); //update priority of s in d[s]
+    
+    var vt = []; //set of vertices
+    
+    for (var i = 0; i < this.nv; i++) {
+    
+    u = PQ.deleteMin(); //delete the minimum priority element 
+    vt[i] = u.item; //insert the item of u on vertex list
+    
+    var adj = this.vert[vt[i]].adjacent.traverse(); //adjacent vertices to u
+    
+    for (var j = 0; j < adj.length; j++) {
+    
+    if (u.prior + adj[j].weight < d[adj[j].target_v]) {
+    
+    d[adj[j].target_v] = u.item + adj[j].weight; //update labels of u
+    pv[adj[j].target_v] = u.prior; //update pu penultimate vertices 
+    PQ.decrease(adj[j].target_v, d[adj[j].target_v]); //update priority of u in d[u]
+    }
+    }
+    }
+    
+    
+    for (var i = 0; i < this.nv; i++) {
+        document.write(d[i], "(" + pv[vt[i]] + "," + vt[i] + ") ");
+    }
+    
+    
+}
 // -----------------------------------------------------------------------
 // published docs section (ref. assignment page)
 // use starter6-based P1M1 code as-is (fixes/improvements OK)
@@ -752,6 +918,7 @@ function dfsImpl(v_i)
 // --------------------
 function incidentEdgesImpl()
 {
+    // return this.adjacent.traverse();
     var edgeNodes = [];
     var e = this.adjacent.traverse();
     for (var i = 0; i < e.length; i++)
